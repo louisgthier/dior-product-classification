@@ -13,16 +13,6 @@
 
 \frame{\titlepage}
 
-\section{Introduction}
-\begin{frame}{Project Overview}
-\begin{itemize}
-    \item We utilized Microsoft's ResNet50 and Google's ViT to extract embeddings.
-    \item Cosine similarity is used to find the best matches between images.
-    \item We preprocess images using \texttt{rembg} to remove backgrounds, as test images (shop pictures) differ from the clean DAM images.
-    \item Embedding extraction assists in labeling products by suggesting potential matches.
-\end{itemize}
-\end{frame}
-
 \begin{frame}{Dataset presentation}
     \begin{itemize}
         \item DAM : 2766 images = 2766 classes
@@ -39,6 +29,17 @@
             \includegraphics[width=\textwidth]{assets/p_img.png}
         \end{figure}
     \end{frame}
+
+\section{Introduction}
+\begin{frame}{Project Overview}
+\begin{itemize}
+    \item We utilized Microsoft's ResNet50 and Google's ViT to extract embeddings.
+    \item Cosine similarity is used to find the best matches between images.
+    \item We preprocess images using \texttt{rembg} to remove backgrounds, as test images (shop pictures) differ from the clean DAM images.
+    \item Embedding extraction assists in labeling products by suggesting potential matches.
+\end{itemize}
+\end{frame}
+
 
 \section{Methodology}
 \begin{frame}{Embedding Extraction Pipeline}
