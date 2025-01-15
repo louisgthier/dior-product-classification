@@ -23,6 +23,23 @@
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Dataset presentation}
+    \begin{itemize}
+        \item DAM : 2766 images = 2766 classes
+        \item 80 test images without labels
+        \item DAM images are clean : regular resolution and proper background
+        \item test images : different resolutions, backgrounds; sometimes multiple items in one image.
+        \item Basically no training set : we will focus on Siamese network methods : embedding images then comparing embeddings
+        \item We (will) manually labelise the test dataset to have an accuracy.
+    \end{itemize}
+    \end{frame}
+    
+    \begin{frame}{Test images}
+        \begin{figure}
+            \includegraphics[width=\textwidth]{assets/p_img.png}
+        \end{figure}
+    \end{frame}
+
 \section{Methodology}
 \begin{frame}{Embedding Extraction Pipeline}
 \begin{columns}
