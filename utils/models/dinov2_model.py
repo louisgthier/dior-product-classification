@@ -1,37 +1,34 @@
+# dinov2_model.py
 import torch
-from torchvision import transforms
-from torch.hub import load as torch_hub_load
+from transformers import AutoImageProcessor, AutoModel
+from .base_model import BaseModel
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+class DinoV2Model(BaseModel):
+    def load_model(self):
+        """
+        Load the DINOv2 model and its corresponding image processor from Hugging Face.
+        """
+        self.processor = AutoImageProcessor.from_pretrained("facebook/dinov2-base")
+        model = AutoModel.from_pretrained("facebook/dinov2-base")
+        return model.to(self.device)
 
-def preprocess_for_model(pil_image):
-    """
-    Preprocess the input image for DINOv2.
-    """
-    preprocess_dino = transforms.Compose([
-        transforms.Resize((224, 224)), 
-        transforms.ToTensor(), 
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]), 
-    ])
+    def preprocess_for_model(self, pil_image):
+        """
+        Preprocess the input image using the Hugging Face image processor.
+        """
+        inputs = self.processor(images=pil_image, return_tensors="pt", use_fast=True)
+        # Move inputs to the correct device
+        return {k: v.to(self.device) for k, v in inputs.items()}
 
-    return preprocess_dino(pil_image).unsqueeze(0).to(device)
-
-def extract_features(pil_image, model):
-    """
-    Extract features for an image using DINOv2.
-    """
-    model.eval()
-
-    img_tensor = preprocess_for_model(pil_image)
-
-    with torch.no_grad():
-        features = model(img_tensor)
-    return features.cpu().numpy().flatten()
-
-def load_model():
-    """
-    Load the DINOv2 model from PyTorch Hub.
-    """
-    # Load model and move it to the correct device
-    model = torch_hub_load("facebookresearch/dinov2", "dinov2_vitb14").to(device)
-    return model
+    def extract_features(self, pil_image):
+        """
+        Extract features for an image using the loaded DINOv2 model.
+        """
+        self.model.eval()
+        inputs = self.preprocess_for_model(pil_image)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+        # Use the last_hidden_state as the feature representation
+        last_hidden_states = outputs.last_hidden_state
+        # return last_hidden_states.mean(dim=1).cpu().numpy().flatten()  # Global average pooling
+        return last_hidden_states.cpu().numpy()

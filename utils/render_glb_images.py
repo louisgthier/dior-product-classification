@@ -175,7 +175,7 @@ def render_object_at_rotations(obj, output_dir, base_name, samples=4096):
             bpy.ops.render.render(write_still=True)
     
     # Save the scene as a Blender file
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(output_dir, f"{base_name}.blend"))
+    # bpy.ops.wm.save_as_mainfile(filepath=os.path.join(output_dir, f"{base_name}.blend"))
     
 
 # ------------------------------------------------------------------------------

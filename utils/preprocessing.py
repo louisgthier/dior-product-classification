@@ -1,4 +1,5 @@
 # RMBG-2.0 Setup
+import PIL
 from PIL import Image
 import torch
 from torchvision import transforms
@@ -78,7 +79,7 @@ def remove_background(input_image: Image.Image, input_path: str = None, backgrou
 
     # Check if a cached version exists.
     if os.path.exists(cached_path):
-        return Image.open(cached_path)
+        return PIL.ImageOps.exif_transpose(Image.open(cached_path))
 
     # No cached image found; proceed with background removal.
     if background_removal == "RMBG_2":
@@ -108,7 +109,7 @@ def remove_background(input_image: Image.Image, input_path: str = None, backgrou
         result = remove(input_converted, session=rembg_session)
         # rembg returns a bytes-like object or PIL image; ensure it's a PIL image.
         if isinstance(result, bytes):
-            result_image = Image.open(io.BytesIO(result))
+            result_image = PIL.ImageOps.exif_transpose(Image.open(io.BytesIO(result)))
         else:
             result_image = result.convert("RGBA")
 
@@ -122,23 +123,24 @@ def preprocess_image(input_path: str, background_removal="RMBG_2") -> Image.Imag
     Preprocess the input image.
     """
     
-    input: Image = Image.open(input_path)
+    input_image: Image = Image.open(input_path)
+    input_image = PIL.ImageOps.exif_transpose(input_image)
     
     # if has alpha channel, use it directly; otherwise, remove background
     has_alpha = False
-    if input.mode == 'RGBA':
-        alpha = np.array(input)[:, :, 3]
+    if input_image.mode == 'RGBA':
+        alpha = np.array(input_image)[:, :, 3]
         if not np.all(alpha == 255):
             has_alpha = True
     if has_alpha:
-        output = input
+        output = input_image
     else:
-        input = input.convert('RGB')
-        max_size = max(input.size)
+        input_image = input_image.convert('RGB')
+        max_size = max(input_image.size)
         scale = min(1, 1024 / max_size)
         if scale < 1:
-            input = input.resize((int(input.width * scale), int(input.height * scale)), Image.Resampling.LANCZOS)
-        output = remove_background(input, input_path, background_removal=background_removal)
+            input_image = input_image.resize((int(input_image.width * scale), int(input_image.height * scale)), Image.Resampling.LANCZOS)
+        output = remove_background(input_image, input_path, background_removal=background_removal)
     output_np = np.array(output)
     alpha = output_np[:, :, 3]
     bbox = np.argwhere(alpha > 0.8 * 255)
