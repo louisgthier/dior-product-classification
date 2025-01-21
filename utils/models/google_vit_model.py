@@ -1,0 +1,25 @@
+# vit_model.py
+import torch
+from transformers import ViTImageProcessor, ViTModel
+from .base_model import BaseModel
+
+class GoogleViTModel(BaseModel):
+    def load_model(self):
+        return ViTModel.from_pretrained("google/vit-base-patch16-224-in21k").to(self.device)
+
+    def preprocess_for_model(self, pil_image):
+        processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")
+        inputs = processor(images=pil_image, return_tensors="pt", use_fast=True)
+        # Move inputs to the correct device
+        return {k: v.to(self.device) for k, v in inputs.items()}
+
+    def extract_features(self, pil_image):
+        inputs = self.preprocess_for_model(pil_image)
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+        last_hidden_states = outputs.last_hidden_state  # shape: (1, seq_len, hidden_size)
+        # last_hidden_states = last_hidden_states[:, 1:, :]  # Exclude CLS token
+        # pooled_embedding = last_hidden_states.mean(dim=1)  # Global average pooling
+        # pooled_embedding = last_hidden_states[:, -1, :] # Take only the last token's hidden state
+        # return pooled_embedding.cpu().numpy().flatten()
+        return last_hidden_states.cpu().numpy()
