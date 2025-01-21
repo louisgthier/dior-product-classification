@@ -8,6 +8,7 @@ import modal
 from utils.preprocessing import preprocess_image
 import base64
 import random
+import concurrent.futures  # Import ThreadPoolExecutor
 
 random.seed(42)
 
@@ -52,11 +53,11 @@ for img_path in dam_images:
 print(f"Total images to process after filtering: {len(filtered_dam_images)}")
 
 def generate_and_save_model(dam_id: str, file_path: str):
-    # Lookup the model from Modal registry
-    model = modal.Cls.lookup("trellis-3d-generation", "Model")()  # Adjust lookup if needed
-
     # Preprocess the image
     image = preprocess_image(file_path)
+    
+    # Lookup the model from Modal registry
+    model = modal.Cls.lookup("trellis-3d-generation", "Model")()  # Adjust lookup if needed
 
     # Call the model without generating videos
     result = model.generate_3d.remote(
@@ -80,23 +81,29 @@ def generate_and_save_model(dam_id: str, file_path: str):
 random.shuffle(filtered_dam_images)
 print(f"Shuffled images for processing")
 
+# Set the maximum number of concurrent calls
+MAX_CONCURRENT_CALLS = 5  # Adjust this value as needed
+
 def main():
     with modal.enable_output():
-        # Loop over each filtered DAM image and process with Modal
-        for idx, img_path in tqdm(enumerate(filtered_dam_images), desc="Generating 3D models via Modal"):
-            # if idx >= 2:
-            #     break
-            
-            file_name = os.path.basename(img_path)
-            dam_id, _ = os.path.splitext(file_name)
-            output_glb_path = os.path.join(cache_dir, f"{dam_id}.glb")
+        # Use ThreadPoolExecutor to manage concurrent calls
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_CALLS) as executor:
+            futures = []
+            for idx, img_path in enumerate(tqdm(filtered_dam_images, desc="Dispatching tasks")):
+                file_name = os.path.basename(img_path)
+                dam_id, _ = os.path.splitext(file_name)
+                output_glb_path = os.path.join(cache_dir, f"{dam_id}.glb")
 
-            # Skip processing if GLB file already exists
-            if os.path.exists(output_glb_path):
-                continue
+                # Skip processing if GLB file already exists
+                if os.path.exists(output_glb_path):
+                    continue
 
-            # Invoke the Modal function for each image
-            generate_and_save_model(dam_id, img_path)
+                # Submit the task to the executor
+                futures.append(executor.submit(generate_and_save_model, dam_id, img_path))
+
+            # Optionally wait for all tasks to complete, showing a progress bar
+            for _ in tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Processing tasks"):
+                pass
             
 if __name__ == "__main__":
     main()

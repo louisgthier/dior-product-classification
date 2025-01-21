@@ -1,4 +1,6 @@
 # RMBG-2.0 Setup
+import os
+os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
 import PIL
 from PIL import Image
 import torch
@@ -6,7 +8,6 @@ from torchvision import transforms
 from transformers import AutoModelForImageSegmentation
 import numpy as np
 import io
-import os
 import hashlib
 
 # Define the base cache directory.
