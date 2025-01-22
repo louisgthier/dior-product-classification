@@ -182,4 +182,60 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}{Improvement Attempt Using NLP}
+    There are some challenging cases, with \textbf{color} or \textbf{texture}:
+    \vspace{0.5cm} % Ajouter un espace vertical
+
+    % Ajouter deux images côte à côte
+% Ajouter une image à gauche et une description à droite
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wrongColorShoes.jpg}
+    \begin{figure}[h]
+        \caption{Example: Color mismatch}
+    \end{figure}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \raggedright
+        \textbf{Blip Description:}
+        \vspace{0.3cm} % Espacement entre le titre et la description
+        \textit{"A white sneaker with a black and white logo on the side"}
+    \end{minipage}
+\end{frame}
+
+\begin{frame}{Using NLP for Image-to-Text and Matching}
+
+Steps : 
+    \vspace{0.5cm} % Ajouter un espace vertical
+    \begin{enumerate}
+        \item Generate descriptions using the \textbf{BLIP model}.
+        \item Convert descriptions into \textbf{text embeddings}.
+        \item Combine \textbf{text embeddings} with 2D image embeddings and 3D-rendered image embeddings
+        \item Use the \textbf{mean embedding} for improved matching.
+    \end{enumerate}
+\end{frame}
+
+% Slide 3: Refining Results with Modern NLP Techniques
+\section{Refining Results}
+\begin{frame}{Improving Top-1 result}
+    \begin{itemize}
+        \item Use \textbf{more recent BLIP models} for better descriptions.
+        \item Question prompt:
+            \begin{quote}
+                What is the object in this image? What is its color? What is its texture? What is a specific detail about it? \\
+                Answer in the format: [object, color, texture, specificity].
+            \end{quote}
+        \end{itemize}
+
+    \vspace{0.5cm}
+    \textbf{Proposed Method}
+    \begin{itemize}
+        \item Select the top-5 DAM candidates selected after applying the cosine similarity on the embedding (without the BLIP embedding). 
+        \item Apply BLIP to the top-5 and the test image to generate a structured description.
+        \item Keep the candidate with the \textbf{highest overlap} in responses with the test image.
+        \end{itemize}
+\end{frame}
+
 \end{document}
