@@ -56,6 +56,10 @@ def generate_and_save_model(dam_id: str, file_path: str):
     # Preprocess the image
     image = preprocess_image(file_path)
     
+    if image is None:
+        print(f"Failed to preprocess image for {dam_id}, skipping")
+        return
+    
     # Lookup the model from Modal registry
     model = modal.Cls.lookup("trellis-3d-generation", "Model")()  # Adjust lookup if needed
 
@@ -82,7 +86,7 @@ random.shuffle(filtered_dam_images)
 print(f"Shuffled images for processing")
 
 # Set the maximum number of concurrent calls
-MAX_CONCURRENT_CALLS = 5  # Adjust this value as needed
+MAX_CONCURRENT_CALLS = 10  # Adjust this value as needed
 
 def main():
     with modal.enable_output():

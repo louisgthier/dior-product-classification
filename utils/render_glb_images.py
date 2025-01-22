@@ -66,8 +66,67 @@ def setup_world_white_background():
     world_nodes = bpy.context.scene.world.node_tree.nodes
     bg_node = world_nodes.get('Background')
     if bg_node:
-        bg_node.inputs[0].default_value = (1, 1, 1, 1)  # white
+        # bg_node.inputs[0].default_value = (1, 1, 1, 1)  # white
         bg_node.inputs[1].default_value = 1.0
+    
+    scene = bpy.context.scene
+    world = scene.world
+
+    # Use nodes for the world background
+    world.use_nodes = True
+    nodes = world.node_tree.nodes
+    links = world.node_tree.links
+
+    # # Access the Background node
+    # background_node = nodes.get("Background")
+    # if background_node is None:
+    #     # If not found, create one and link to the World Output
+    #     background_node = nodes.new(type="ShaderNodeBackground")
+    #     output_node = nodes.get("World Output")
+    #     if output_node is None:
+    #         output_node = nodes.new(type="ShaderNodeOutputWorld")
+    #     links.new(background_node.outputs[0], output_node.inputs[0])
+
+    # # Set the background color to green (RGBA: (0, 1, 0, 1))
+    # background_node.inputs[0].default_value = (0.0, 1.0, 0.0, 1.0)
+    
+    # scene.display_settings.display_device = 'sRGB'  # or 'None' for raw output if available
+    # scene.view_settings.view_transform = 'Standard'
+    # scene.view_settings.look = 'None'
+    # scene.view_settings.exposure = 0.0
+    # scene.view_settings.gamma = 1.0
+    
+    # No reflection of the world background on objects
+    
+    # Clear default nodes for a clean setup
+    nodes = world.node_tree.nodes
+    links = world.node_tree.links
+    nodes.clear()
+
+    # Create necessary nodes
+    output_node = nodes.new(type='ShaderNodeOutputWorld')
+    mix_shader = nodes.new(type='ShaderNodeMixShader')
+    light_path = nodes.new(type='ShaderNodeLightPath')
+    bg_camera = nodes.new(type='ShaderNodeBackground')
+    bg_other = nodes.new(type='ShaderNodeBackground')
+
+    # Set the colors for backgrounds
+    bg_camera.inputs['Color'].default_value = (1.0, 1.0, 1.0, 1.0)  # Pure white for camera rays
+    bg_other.inputs['Color'].default_value = (1.0, 1.0, 1.0, 0.0)   # Pure green (or another neutral color) for other rays
+
+    # Arrange nodes (optional for readability)
+    output_node.location = (400, 0)
+    mix_shader.location = (200, 0)
+    light_path.location = (0, 100)
+    bg_camera.location = (0, -100)
+    bg_other.location = (0, -200)
+
+    # Create connections
+    links.new(light_path.outputs['Is Camera Ray'], mix_shader.inputs['Fac'])
+    links.new(bg_camera.outputs['Background'], mix_shader.inputs[1])
+    links.new(bg_other.outputs['Background'], mix_shader.inputs[2])
+    links.new(mix_shader.outputs['Shader'], output_node.inputs['Surface'])
+
 
 def setup_camera():
     """
@@ -167,8 +226,10 @@ def render_object_at_rotations(obj, output_dir, base_name, samples=4096):
         obj.rotation_euler = (0, 0, math.radians(angle_degrees))
         
         # Set output filename
-        filename = f"{base_name}-{i+1}.jpeg"
+        filename = f"{base_name}-{i+1}.png"
         bpy.context.scene.render.filepath = os.path.join(output_dir, filename)
+        
+        # bpy.context.scene.render.filepath = os.path.join(f"tmp/TRELLIS/{samples}", filename)
         
         # Render
         with stdout_redirected():
@@ -188,12 +249,27 @@ light = setup_camera_light(cam)
 
 # Set render settings (1024x1024, JPEG, Cycles)
 scene = bpy.context.scene
+
+# After setting up scene and before rendering loop
 scene.render.engine = 'CYCLES'
-scene.render.film_transparent = False  # White background
-scene.render.resolution_x = 1024
-scene.render.resolution_y = 1024
+# scene.cycles.device = 'GPU'
+scene.render.film_transparent = True  # White background
+scene.render.resolution_x = 224
+scene.render.resolution_y = 224
 scene.render.resolution_percentage = 100
-scene.render.image_settings.file_format = 'JPEG'
+scene.render.image_settings.file_format = 'PNG'
+scene.render.image_settings.color_mode = 'RGBA'
+
+# # Configure Cycles to use Metal GPU (slower lol)
+# prefs = bpy.context.preferences
+# cprefs = prefs.addons['cycles'].preferences
+# cprefs.compute_device_type = 'METAL'
+# cprefs.get_devices()
+# for device in cprefs.devices:
+#     device.use = True  # Enable GPU devices
+
+# view_layer = bpy.context.view_layer
+# view_layer.cycles.use_denoising = True
 
 # ------------------------------------------------------------------------------
 # MAIN LOOP: Import each GLB and render
@@ -209,7 +285,7 @@ for root, dirs, files in os.walk(input_root):
             output_dir = os.path.join(output_root, dir_name, base_name)
             
             # Skip if already rendered
-            if os.path.exists(os.path.join(output_dir, f"{base_name}-8.jpeg")):
+            if os.path.exists(os.path.join(output_dir, f"{base_name}-8.png")):
                 print("Skipping already rendered:", base_name)
                 continue
             
@@ -246,7 +322,7 @@ for root, dirs, files in os.walk(input_root):
             print("Rendering:", base_name)
             
             # Render 8 images from different angles
-            render_object_at_rotations(main_obj, output_dir, base_name, samples=4096)
+            render_object_at_rotations(main_obj, output_dir, base_name, samples=512)
             print("Time taken:", time.time() - t)
 
 print("Rendering completed.")

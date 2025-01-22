@@ -5,11 +5,11 @@ from .base_model import BaseModel
 
 class GoogleViTModel(BaseModel):
     def load_model(self):
+        self.processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")
         return ViTModel.from_pretrained("google/vit-base-patch16-224-in21k").to(self.device)
 
     def preprocess_for_model(self, pil_image):
-        processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")
-        inputs = processor(images=pil_image, return_tensors="pt", use_fast=True)
+        inputs = self.processor(images=pil_image, return_tensors="pt", use_fast=True)
         # Move inputs to the correct device
         return {k: v.to(self.device) for k, v in inputs.items()}
 
