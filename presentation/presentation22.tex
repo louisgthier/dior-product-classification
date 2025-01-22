@@ -25,143 +25,113 @@
 \begin{columns}
     \column{0.5\textwidth}
     \begin{figure}[t]
-        \includegraphics[width=\textwidth]{assets/shoes_test.jpg}
+        \includegraphics[width=0.6\textwidth]{assets/shoe_test.jpg}
         \caption{Test Image}
     \end{figure}
     \column{0.5\textwidth}
     \begin{figure}[t]
-        \includegraphics[width=\textwidth]{assets/shoes_reference.jpeg}
+        \includegraphics[width=0.6\textwidth]{assets/shoe_reference.jpeg}
         \caption{Reference Image}
     \end{figure}
 \end{columns}
 
 \end{frame}
 
-\begin{frame}{Dataset presentation}
+\begin{frame}{Test set labeling}
     \begin{itemize}
-        \item DAM : 2766 images = 2766 classes
-        \item 80 test images without labels
-        \item DAM images are clean : regular resolution and proper background
-        \item test images : different resolutions, backgrounds; sometimes multiple items in one image.
-        \item Basically no training set : we will focus on Siamese network methods : embedding images then comparing embeddings
-        \item We (will) manually labelise the test dataset to have an accuracy.
+        \item We labeled the test set manually, using embeddings to suggest potential matches.
+        \item The test set contains 80 images.
+        \item Some items don't have a corresponding image in the DAM.
+        \item Some items are very similar to others, making classification challenging.
     \end{itemize}
-    \end{frame}
-    
-    \begin{frame}{Test images}
+    \begin{columns}
+        \column{0.5\textwidth}
         \begin{figure}
-            \includegraphics[width=\textwidth]{assets/p_img.png}
+            \includegraphics[width=0.65\textwidth]{assets/very_similar_items_1.jpeg}
+            \caption{Black bag}
         \end{figure}
-    \end{frame}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.65\textwidth]{assets/very_similar_items_2.jpeg}
+            \caption{Another black bag}
+        \end{figure}
+    \end{columns}
+\end{frame}
+
 
 \section{Introduction}
 \begin{frame}{Project Overview}
 \begin{itemize}
-    \item We utilized Microsoft's ResNet50 and Google's ViT to extract embeddings.
-    \item Cosine similarity is used to find the best matches between images.
-    \item We preprocess images using \texttt{rembg} to remove backgrounds, as test images (shop pictures) differ from the clean DAM images.
-    \item Embedding extraction assists in labeling products by suggesting potential matches.
+    \item We tried a lot of models to extract embeddings: Microsoft's ResNet50, Google's ViT Patch-16, OpenAI's CLIP, Meta's DINOv2 and ViTMSN.
+    \item Cosine similarity is used to find the best matches between images. Better than Euclidean distance. We also tried a mix of both.
+    \item We replaced \texttt{rembg} background removal by \texttt{RMBG 2.0}.
+    \item All images were cropped and zoomed to the object.
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.5\textwidth]{assets/glasses_rembg.png}
+            \caption{Background removal using \texttt{rembg}}
+        \end{figure}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.5\textwidth]{assets/glasses_rmbg_2.png}
+            \caption{Background removal using \texttt{RMBG 2.0}}
+        \end{figure}
+    \end{columns}
 \end{itemize}
 \end{frame}
 
-
-\section{Methodology}
-\begin{frame}{Embedding Extraction Pipeline}
-\begin{columns}
-    \column{0.5\textwidth}
+\begin{frame}{Data augmentation with a 3D generation model}
     \begin{itemize}
-        \item Use ResNet50 and ViT to extract image embeddings.
-        \item Employ cosine similarity to rank matches.
-        \item Preprocess test images with \texttt{rembg} to isolate objects from noisy backgrounds.
+        \item We used \textbf{TRELLIS} for generating 3D models for the 2700 DAM assets.
+        \item We used \textbf{Blender} to render the 3D models in 8 different angles each.
     \end{itemize}
-    \column{0.5\textwidth}
-    \begin{figure}
-        \includegraphics[width=0.6\textwidth]{assets/pipeline_overview.png}
-        \caption{Pipeline overview}
-    \end{figure}
-\end{columns}
+    
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.65\textwidth]{assets/trellis_input.png}
+            \caption{Input for TRELLIS}
+        \end{figure}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=1\textwidth]{assets/trellis_output.png}
+            \caption{TRELLIS generated 3D model}
+        \end{figure}
+    \end{columns}
+    
 \end{frame}
 
-\begin{frame}{Embedding Extraction Pipeline}
+\begin{frame}{Data augmentation with a 3D generation model}
+    % 4 images, 2x2
     \begin{figure}
-        \includegraphics[width=\textwidth]{assets/background_removal.png}
-        \caption{Background removal using \texttt{rembg}, scaling and center-cropping}
+        \centering
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-1.jpeg}
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-2.jpeg}
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-3.jpeg}
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-4.jpeg}
+        \caption{3D renders of a bag}
     \end{figure}
 \end{frame}
 
-\begin{frame}{Good Classification Example}
-\begin{itemize}
-    \item Original image and extracted object.
-    \item Top 5 matches with high similarity scores.
-\end{itemize}
-\begin{figure}
-    \includegraphics[width=\textwidth]{assets/good_classification.png}
-    \caption{Example of a good classification result}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Bad Classification Example}
-\begin{itemize}
-    \item Challenges: reflections on the glass adversely affecting background removal and embeddings.
-\end{itemize}
-\begin{figure}
-    \includegraphics[width=\textwidth]{assets/bad_classification.png}
-    \caption{Example of a bad classification due to reflections}
-\end{figure}
-\end{frame}
-
-\section{Future Work}
-\begin{frame}{Enhancing the Approach}
-\begin{itemize}
-    \item Use \textbf{TRELLIS} for generating 3D models and performing data augmentation with various object poses.
-    \item Explore \textbf{Siamese Networks} to refine embeddings by focusing on important features.
-\end{itemize}
-
-\begin{columns}
-    \column{0.5\textwidth}
-    \begin{figure}
-        \includegraphics[width=0.65\textwidth]{assets/trellis_input.png}
-        \caption{Input for TRELLIS}
-    \end{figure}
-    \column{0.5\textwidth}
-    \begin{figure}
-        \includegraphics[width=1\textwidth]{assets/trellis_output.png}
-        \caption{TRELLIS generated 3D model}
-    \end{figure}
-\end{columns}
-
+\begin{frame}{The performance improvements}
+    \begin{itemize}
+        \item Adding embeddings of the 3D renders improved the Top-1 performance from 36\% to 0.42\%.
+        \item Averaging 2D and 3D embeddings improved the Top-1 performance from 0.42\% to 0.52\%.
+        \item We then removed all 2D embeddings and only used 3D embeddings, which improved the Top-1 performance from 0.52\% to 0.56\%.
+        \item We used gradient descent on 25\% of the test set to tune the weights for merging 2D and 3D embeddings, as well as the feature selection weights, which improved the Top-1 performance from 0.56\% to 0.61\%.
+        \item Final results: Top-1: 0.61\%, Top-3: 0.79\%, Top-5: 0.84\%.
+    \end{itemize}
 \end{frame}
 
 \section{User Interface}
 \begin{frame}{Web Interface with Gradio}
 \begin{itemize}
-    \item Develop a quick UI using Gradio.
+    \item Develop a simple UI using Gradio.
     \item Users can upload a picture and get top-X matches.
-    \item This tool can aid in manual labeling and refine embeddings.
+    \item The UI will display the reference DAM image with its ID, the top-X matches, and a 3D render of the item.
 \end{itemize}
 \end{frame}
-
-
-\begin{frame}{ViTMSN Model}
-\begin{itemize}
-    \item Considering the ViTMSN approach for improved performance.
-    \item Joint-embedding architecture from \emph{Masked Siamese Networks for Label-Efficient Learning}.
-    \item Promising for low-shot and extreme low-shot regimes.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Action Plan}
-    \begin{itemize}
-        \item \textbf{Focus 1: Evaluate Existing Models:} 
-              Assess the performance of ResNet and ViT models with background removal preprocessing on the test set.
-        \item \textbf{Focus 2: Data Augmentation:} 
-              Create synthetic training images to enhance dataset diversity and size.
-        \item \textbf{Focus 3: Classification Models:} 
-              Experiment with and evaluate classification models to optimize prediction performance.
-        \item \textbf{Focus 4: Multi-Object Classification:} 
-              Develop methods to accurately classify and handle images containing multiple objects simultaneously.
-    \end{itemize}
-    \end{frame}
 
 \section{NLP Approach}
     \begin{frame}{Using NLP for Image-to-Text and Matching}
@@ -191,7 +161,7 @@
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{wrongColorShoes.jpg}
+        \includegraphics[width=\textwidth]{assets/wrongColorShoes.jpg}
     \begin{figure}[h]
         \caption{Example: Color mismatch}
     \end{figure}
