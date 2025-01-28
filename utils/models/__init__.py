@@ -4,3 +4,5 @@ from utils.models.facebook_vitmsn_model import FacebookViTMSNModel
 from utils.models.google_vit_model import GoogleViTModel
 from utils.models.microsoft_resnet_model import MicrosoftResNetModel
 from utils.models.openai_clip_model import OpenAIClipModel
+from utils.models.fashion_clip_model import FashionCLIPModel
+from utils.models.nomic_embed_vision_model import NomicEmbedVisionModel
