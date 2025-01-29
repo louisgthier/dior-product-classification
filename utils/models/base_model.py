@@ -5,6 +5,7 @@ import torch
 class BaseModel(ABC):
     def __init__(self):
         self.device = "cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu"
+        self.model_name = type(self).__name__
         self.model = self.load_model()
         print(f"Model loaded on device: {self.device}")
 

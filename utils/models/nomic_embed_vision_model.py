@@ -47,5 +47,9 @@ class NomicEmbedVisionModel(BaseModel):
         with torch.no_grad():
             # Extract image features
             img_emb = self.model(**inputs).last_hidden_state
-            img_embeddings = F.normalize(img_emb[:, 0], p=2, dim=1)
-        return img_embeddings.cpu().numpy()
+            # print(f"img_emb shape: {img_emb.shape}")
+            # img_embeddings = F.normalize(img_emb[:, 0], p=2, dim=1)
+            # print(f"img_embeddings shape: {img_embeddings.shape}")
+        # return img_embeddings.cpu().numpy()
+        
+        return img_emb.cpu().numpy()

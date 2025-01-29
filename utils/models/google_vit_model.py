@@ -5,8 +5,12 @@ from .base_model import BaseModel
 
 class GoogleViTModel(BaseModel):
     def load_model(self):
-        self.processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")
-        return ViTModel.from_pretrained("google/vit-base-patch16-224-in21k").to(self.device)
+        model_size = "large"
+        in21k = False
+        name = f"google/vit-{model_size}-patch16-224{'-in21k' if in21k else ''}"
+        self.processor = ViTImageProcessor.from_pretrained(name)
+        self.model_name = type(self).__name__ + "_" + model_size + ("_in21k" if in21k else "")
+        return ViTModel.from_pretrained(name).to(self.device)
 
     def preprocess_for_model(self, pil_image):
         inputs = self.processor(images=pil_image, return_tensors="pt", use_fast=True)
