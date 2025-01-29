@@ -33,9 +33,23 @@
 \end{columns}
 \vspace{0.5cm}
 \begin{block}{Objectif}
-Pour une image test d'article, trouver l'article correspondant dans la base DAM.
+\begin{itemize}
+    \item Pour une image test d'article, trouver l'article (donc la référence) correspondant dans la base DAM (2766 articles).
+    \item L'article doit être parmi les 1, 3 ou 5 références proposées.
+\end{itemize}
 \end{block}
 \end{frame}
+
+\begin{frame}{Jeu de données : Difficultés}
+\begin{itemize}
+    \item Grand nombre d'articles dans la base DAM (2766 articles).
+    \item Unique photo par classe : difficile de faire de la classification
+    \item Les images (surtout celles du test) ne sont pas standardisées (background, orientation...)
+    \item Images en double dans DAM
+    \item Images de test dont le label n'est pas présent dans DAM.
+\end{itemize}
+\end{frame}
+
 
 \section{Intuitions}
 \begin{frame}{Intuitions}
