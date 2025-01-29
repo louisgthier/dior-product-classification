@@ -5,8 +5,8 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 
-\title{Image Embedding for Product Labeling}
-\author{Couture Vision}
+\title{Challenge IA : Présentation finale}
+\author{Groupe : Couture Vision}
 \date{\today}
 
 \begin{document}
@@ -23,7 +23,7 @@
     \column{0.5\textwidth}
     \begin{figure}
         \includegraphics[width=0.6\textwidth]{assets/shoe_test.jpg}
-        \caption{Image test}
+        \caption{Image de test}
     \end{figure}
     \column{0.5\textwidth}
     \begin{figure}
@@ -105,14 +105,46 @@
 \section{Expérimentations non concluantes}
 \begin{frame}{Expérimentations non concluantes}
 \begin{itemize}
-    \item \textbf{Amélioration du Top-1 par NLP} :
+    \item \textbf{Tentative d'amélioration du Top-1 par NLP} :
     \begin{itemize}
-        \item Utilisation du modèle BLIP pour générer des descriptions d'articles.
-        \item Objectif : éviter les erreurs de couleur ou de texture.
-        \item Limite : Les descriptions générées sont trop pauvres pour améliorer significativement les résultats.
+        \item Utilisation du modèle BLIP Base pour générer des descriptions d'articles.
+        \item Problème : Les descriptions générées sont trop pauvres pour améliorer significativement les résultats.
     \end{itemize}
 \end{itemize}
+\begin{table}[h]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{c c c}
+        \large \textbf{Image de test} & \large \textbf{Top-1} & \large \textbf{Top-2 (Article à trouver)} \\ 
+        \includegraphics[width=0.5\textwidth]{assets/test_sunglasses.png} & 
+        \includegraphics[width=0.5\textwidth]{assets/top1_sunglasses.png} & 
+        \includegraphics[width=0.5\textwidth]{assets/true_article_sunglasses.png} \\ 
+        \parbox{0.3\textwidth}{\centering \large \textit{The black sunglasses with gold temples}} & 
+        \parbox{0.3\textwidth}{\centering \large \textit{A pair of sunglasses with a black frame and gold arms}} & 
+        \parbox{0.3\textwidth}{\centering \large \textit{A pair of sunglasses with a black frame and gold details}} \\ 
+    \end{tabular}%
+    }
+\end{table}
 \end{frame}
+
+\section{Expérimentations non concluantes}
+\begin{frame}{Expérimentations non concluantes}
+\item \textbf{Fine-tuning de ViT :}
+\begin{itemize}
+        \item Faible convergence malgré un taux d'apprentissage réduit.
+        \item Très peu de données
+\end{itemize}
+
+\vspace{0.5cm}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/finetuning_vit.png}
+    \caption{Exemple de prédiction après fine-tuning}
+\end{figure}
+\end{frame}
+
+
 
 \section{Conclusion}
 \begin{frame}{Conclusion}
@@ -121,7 +153,7 @@
     \item Résultats encourageants avec une précision Top-1 de 40\%, mais améliorable.
     \item Pistes futures :
     \begin{itemize}
-        \item Utilisation de modèles NLP avec plus de paramètres pour enrichir les descriptions d'images.
+        \item Utilisation de modèles NLP avec plus de paramètres pour enrichir les descriptions d'images et améliorer la prédiction du top-1.
     \end{itemize}
 \end{itemize}
 \end{frame}
