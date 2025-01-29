@@ -61,6 +61,85 @@
 \end{frame}
 
 \section{Principe et architecture du modèle retenu}
+\begin{frame}{Traitement des images}
+    \footnotesize
+    \textbf{Suppression du fond avec \texttt{rembg} et recentrage de l'objet}
+    \begin{itemize}
+        \item Les images à inférer contiennent un arrière-plan indésirable.
+        \item Utilisation de la bibliothèque \texttt{rembg} avec le modèle \texttt{u2net} pour retirer le fond. Objectif : réduire le bruit pour l'extraction des caractéristiques. 
+        \item Ensuite, un traitement d’image identifie les pixels non transparents pour recentrer et recadrer l’objet.
+    \end{itemize}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.4\textwidth]{assets/IMG_6883.jpg}
+            \caption{Example of Image test}
+        \end{figure}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.4\textwidth]{assets/glasses_rembg.png}
+            \caption{Extracted object with rembg}
+        \end{figure}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Amélioration avec \texttt{RMBG-2.0}}
+    \footnotesize
+    \textbf{Utilisation du modèle \texttt{briaai/RMBG-2.0} pour une meilleure suppression du fond}
+    \begin{itemize}
+        \item Le modèle précédent pouvait générer des artefacts ou des découpages imprécis.
+        \item Amélioration de la qualité du traitement en utilisant le modèle \texttt{briaai/RMBG-2.0}.
+        \item Ce modèle utilise des techniques avancées pour un détourage plus précis et net.
+    \end{itemize}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.4\textwidth]{assets/IMG_6883.jpg}
+            \caption{Example of Image test}
+        \end{figure}
+        \column{0.6\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.4\textwidth]{assets/glasses_rmbg_2.png}
+            \caption{Extracted object with rmbg-2.0}
+        \end{figure}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Comparaison des méthodes de suppression de fond}
+    \textbf{Tableau comparatif des performances techniques}
+    \begin{table}[]
+        \centering
+        \resizebox{\textwidth}{!}{
+        \begin{tabular}{|l|c|c|}
+            \hline
+            \textbf{Critère} & \textbf{U2Net (rembg)} & \textbf{RMBG-2.0} \\
+            \hline
+            Architecture du modèle & U-Net modifié & Transformer basé \\
+            \hline
+            Nombre de paramètres & 176M & 200M+ \\
+            \hline
+            Type d'entraînement & Supervisé sur DUTS & Supervisé avec dataset étendu \\
+            \hline
+            Qualité du détourage & Moyenne (bords flous) & Excellente (détails fins) \\
+            \hline
+            Gestion des transparences & Basique & Avancée (cheveux, objets fins) \\
+            \hline
+            Rapidité de traitement & Rapide & Un peu plus lent \\
+            \hline
+            Consommation mémoire & Modérée & Plus élevée \\
+            \hline
+            Adaptabilité aux arrière-plans complexes & Moyenne & Très bonne \\
+            \hline
+        \end{tabular}
+        }
+        \caption{Comparaison entre U2Net et RMBG-2.0}
+    \end{table}
+    \begin{itemize}
+        \item \textbf{RMBG-2.0 et recentrage de l'objet} sont appliqués aux images du DAM et à chaque image destinée à l'inférence
+    \end{itemize}
+\end{frame}
+
+\section{Principe et architecture du modèle retenu}
 \begin{frame}{Modèle utilisé}
 \begin{itemize}
     \item \textbf{Extraction et traitement de l'article} : Utilisation de \texttt{RMBG} pour rogner l'image et supprimer le fond. 
