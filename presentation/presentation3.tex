@@ -73,9 +73,9 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Modèle utilisé}
+\begin{frame}{Modèles utilisés}
     \begin{itemize}
-        \item \textbf{Extraction et traitement de l'article} : Utilisation de \texttt{RMBG} pour rogner l'image et supprimer le fond. 
+        \item \textbf{Extraction et traitement de l'article} : Utilisation de \texttt{RMBG-2.0} pour rogner l'image et supprimer le fond. 
         \item \textbf{Embeddings d'image} : Modèle ViT par Google (Base Patch-32, 86.4M paramètres).
         \item \textbf{Triplet Network} : Permet d'optimiser les embeddings pour réduire la distance cosinus entre des images similaires.
     \end{itemize}
@@ -88,7 +88,7 @@
     \begin{itemize}
         \item Les images à inférer contiennent un arrière-plan indésirable.
         \item Utilisation de la bibliothèque \texttt{rembg} avec le modèle \texttt{u2net} pour retirer le fond. Objectif : réduire le bruit pour l'extraction des caractéristiques. 
-        \item Ensuite, un traitement d’image identifie les pixels non transparents pour recentrer et recadrer l’objet.
+        \item Ensuite, un traitement d’image identifie les pixels non transparents pour \textbf{recentrer et recadrer} l’objet.
     \end{itemize}
     \begin{columns}
         \column{0.5\textwidth}
@@ -139,11 +139,7 @@
             \hline
             Nombre de paramètres & 44M & 221M \\
             \hline
-            Type d'entraînement & Supervisé sur DUTS & Supervisé avec dataset étendu \\
-            \hline
             Qualité du détourage & Moyenne (bords flous) & Excellente (détails fins) \\
-            \hline
-            Gestion des transparences & Basique & Avancée (cheveux, objets fins) \\
             \hline
             Rapidité de traitement & Rapide & Un peu plus lent \\
             \hline
