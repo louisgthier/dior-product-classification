@@ -1,18 +1,17 @@
 # fashion_clip_model.py
+import os
+os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
 import torch
-from transformers import CLIPProcessor, CLIPModel
 from .base_model import BaseModel
-from PIL import Image
-# from fashion_clip.fashion_clip import FashionCLIP
-
+from fashion_clip.fashion_clip import FashionCLIP
+import numpy as np
 class FashionCLIPModel(BaseModel):
     def load_model(self):
         """
         Load the Fashion-CLIP model.
         """
-        model = CLIPModel.from_pretrained("patrickjohncyh/fashion-clip")
-        self.processor = CLIPProcessor.from_pretrained("patrickjohncyh/fashion-clip")
-        return model.to(self.device)
+        self.fclip = FashionCLIP('fashion-clip')
+        return self.fclip
         
         # Load the Fashion-CLIP model
         # model = FashionCLIP('fashion-clip')
@@ -52,12 +51,13 @@ class FashionCLIPModel(BaseModel):
         Returns:
             numpy.ndarray: The extracted image features as a flattened NumPy array.
         """
-        self.model.eval()
-        inputs = self.preprocess_for_model(pil_image)
-        with torch.no_grad():
-            # Extract image features
-            image_features = self.model.get_image_features(**inputs)
-        return image_features.cpu().numpy()
+        
+        if type(pil_image) != list:
+            pil_image = [pil_image]
+        
+        image_embeddings = self.fclip.encode_images(pil_image, batch_size=32)
+        # image_embeddings = image_embeddings/np.linalg.norm(image_embeddings, ord=2, axis=-1, keepdims=True)
+        return image_embeddings
         
         # if type(pil_image) != list:
         #     pil_image = [pil_image]
@@ -66,40 +66,3 @@ class FashionCLIPModel(BaseModel):
         #     return image_embeddings[0]
         # return image_embeddings
     
-    def extract_text_features(self, texts):
-        """
-        Extract text features using the Fashion-CLIP model.
-
-        Args:
-            texts (list of str): List of text descriptions.
-
-        Returns:
-            numpy.ndarray: The extracted text features as a flattened NumPy array.
-        """
-        self.model.eval()
-        # Dummy image to satisfy the processor requirements
-        dummy_image = Image.new("RGB", (224, 224))
-        inputs = self.preprocess_for_model(dummy_image, texts=texts)
-        with torch.no_grad():
-            # Extract text features
-            text_features = self.model.get_text_features(**inputs)
-        return text_features.cpu().numpy().flatten()
-    
-    def compute_similarity(self, pil_image, texts):
-        """
-        Compute similarity scores between an image and a list of texts.
-
-        Args:
-            pil_image (PIL.Image.Image): The input image.
-            texts (list of str): List of text descriptions.
-
-        Returns:
-            numpy.ndarray: Softmax probabilities representing similarity scores.
-        """
-        self.model.eval()
-        inputs = self.preprocess_for_model(pil_image, texts=texts)
-        with torch.no_grad():
-            outputs = self.model(**inputs)
-            logits_per_image = outputs.logits_per_image  # Image-text similarity scores
-            probs = logits_per_image.softmax(dim=1)
-        return probs.cpu().numpy()

@@ -51,10 +51,10 @@ from utils.models import DinoV2Model, FacebookViTMSNModel, GoogleViTModel, Micro
 
 # Define paths to necessary files and directories
 BASE_CACHE_DIR = '.cache'
-MODEL_PATH = os.path.join(BASE_CACHE_DIR, 'models', 'selected_model.pth')  # Update as needed
-DAM_FEATURE_PATHS_PICKLE = os.path.join(BASE_CACHE_DIR, 'paths', 'dam_feature_paths.pkl')  # Update as needed
-FEATURE_SELECTION_COEFFICIENTS_PICKLE = os.path.join(BASE_CACHE_DIR, 'coefficients', 'feature_selection_coefficients.pkl')  # Update as needed
-MERGING_COEFFICIENTS_PICKLE = os.path.join(BASE_CACHE_DIR, 'coefficients', 'merging_coefficients.pkl')  # Update as needed
+BASE_PRECOMPUTED_DIR = "precomputed"
+DAM_FEATURE_PATHS_PICKLE = os.path.join(BASE_PRECOMPUTED_DIR, 'paths', 'dam_feature_paths.pkl')  # Update as needed
+FEATURE_SELECTION_COEFFICIENTS_PICKLE = os.path.join(BASE_PRECOMPUTED_DIR, 'coefficients', 'feature_selection_coefficients.pkl')  # Update as needed
+MERGING_COEFFICIENTS_PICKLE = os.path.join(BASE_PRECOMPUTED_DIR, 'coefficients', 'merging_coefficients.pkl')  # Update as needed
 LABELS_CSV_PATH = 'labels/handmade_test_labels.csv'  # Update as needed
 EMBEDDING_AGGREGRATION_METHOD = 'max'  # Update as needed
 
@@ -70,7 +70,7 @@ print(f"Using device: {device}")
 # Initialize and load the model
 model = GoogleViTModel()
     
-FAISS_INDEX_PATH = os.path.join(BASE_CACHE_DIR, 'faiss', f'dam_features-{model.model_name}-RMBG_2-3d.index')  # Update as needed
+FAISS_INDEX_PATH = os.path.join(BASE_PRECOMPUTED_DIR, 'faiss', f'dam_features-{model.model_name}-RMBG_2-3d.index')  # Update as needed
 
 # ---------------------------- Feature Aggregation ----------------------------
 
@@ -277,7 +277,13 @@ def find_similar_images(uploaded_image, top_n=5):
             match_ids.append(dam_id)
 
         print("Similarity search completed successfully.")
-        return match_images, "\n".join(match_ids)
+        
+        # Path to the .glb file of the best match
+        best_match_glb_path = os.path.join(BASE_CACHE_DIR, 'TRELLIS', f"{matches[0]}.glb")
+        if not os.path.exists(best_match_glb_path):
+            best_match_glb_path = None
+
+        return match_images, "\n".join(match_ids), best_match_glb_path
 
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
@@ -299,35 +305,31 @@ with gr.Blocks() as demo:
         with gr.Column():
             output_gallery = gr.Gallery(label="Top Matches")
             dam_ids_output = gr.Textbox(label="DAM IDs", interactive=False)
+            best_match_3d = gr.Model3D(label="Best Match 3D Model")
 
-    # Define the action on button click with progress updates
     def on_search(image, top_n):
         progress = ""
         try:
             if image is None:
                 progress = "Please upload an image."
-                return progress, None
+                return progress, None, None, None
             progress += "Starting similarity search...\n"
-            match_images, match_ids = find_similar_images(image, top_n=top_n)
+            match_images, match_ids, best_match_glb_path = find_similar_images(image, top_n=top_n)
             if isinstance(match_images, str):
-                # An error message was returned
                 progress += match_images
-                return progress, None
-            # Combine images and IDs for display
+                return progress, None, None, None
             display_images = []
             display_ids = []
             for img, dam_id in zip(match_images, match_ids.split('\n')):
                 display_images.append(img)
                 display_ids.append(dam_id)
             progress += "Similarity search completed successfully."
-            return progress, display_images, "\n".join(display_ids)
+            return progress, display_images, "\n".join(display_ids), best_match_glb_path
         except Exception as e:
             progress += f"An error occurred during the search: {e}"
-            return progress, None, None
+            return progress, None, None, None
 
-    # Update the `find_similar_images` function to accept and update progress_text
-    search_button.click(fn=on_search, inputs=[image_input, top_n_slider], outputs=[progress_text, output_gallery, dam_ids_output])
-
+    search_button.click(fn=on_search, inputs=[image_input, top_n_slider], outputs=[progress_text, output_gallery, dam_ids_output, best_match_3d])
 # ---------------------------- Launch Gradio App ----------------------------
 
 if __name__ == "__main__":

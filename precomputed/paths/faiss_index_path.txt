@@ -1,0 +1,1 @@
+.cache/faiss/dam_features-GoogleViTModel_large-RMBG_2-3d.index

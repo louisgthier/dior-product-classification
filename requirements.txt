@@ -1,0 +1,13 @@
+torch
+pandas
+tqdm
+gradio
+tempfile
+numpy
+scikit-learn
+faiss-cpu
+transformers
+pillow
+matplotlib
+importlib_metadata
+git+https://github.com/louisgthier/fashion-clip.git

@@ -13,7 +13,10 @@ import hashlib
 # Define the base cache directory.
 BASE_CACHE_DIR = '.cache'
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.mps.is_available() else 'cpu')
+try:
+    device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.mps.is_available() else 'cpu')
+except AttributeError: # For older versions of PyTorch
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
 rmbg_2_model, rmbg_2_transform = None, None
