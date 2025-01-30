@@ -162,13 +162,13 @@
 
 \begin{frame}{Présentation du Modèle ViT Large Patch16 224}
     \begin{itemize}
-        \item \textbf{Nom du Modèle} : \texttt{google/vit-large-patch16-224-in21k}
+        \item \textbf{Nom du Modèle} : \texttt{google/vit-large-patch16-224}
         \item \textbf{Origine} : Développé par Google
         \item \textbf{Nombre de Paramètres} : Environ 304 millions
         \item \textbf{Pré-entraînement} : 
         \begin{itemize}
-            \item Dataset : ImageNet-21k
-            \item Contenu : Environ 14 millions d'images couvrant 21 843 classes
+            \item Dataset : ImageNet
+            \item Contenu : Environ 1.2 million d'images couvrant 1000 classes
         \end{itemize}
     \end{itemize}
     \vspace{0.5cm}
@@ -180,16 +180,70 @@
     \item \textbf{Data augmentation} : Certaines images de test ne sont pas prises du même angle que les images DAM.
     \begin{itemize}
         \item Utilisation de \textbf{TRELLIS} pour générer des modèles 3D.
-        \item Exemple :
-        \begin{figure}
-            \includegraphics[width=0.3\textwidth]{}
-            \includegraphics[width=0.3\textwidth]{}
-            \includegraphics[width=0.3\textwidth]{}
-            \caption{Rendu 3D d'un sac.}
-        \end{figure}
     \end{itemize}
-    \item Suppression des images de test sans correspondance dans la base DAM.
+    \item Recadrage et recentrage des images.
+    \item Tests de nombreux modèles d'embedding: Microsoft ResNet-50, DinoV2, Nomic EmbedVision... les meilleurs résultats avec ViT de Google.
+    \item Comparaison de différentes méthodes d'aggrégation des embeddings: mean, max, min, concaténation, CLS seulement... max donne les meilleurs résultats.
+    \item Comparaison de différentes métriques de similarité: cosine et euclidean, cosine donne les meilleurs résultats.
 \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Data augmentation avec un modèle de géneration 3D}
+    \begin{itemize}
+        \item Nous avons utilisé \textbf{TRELLIS} pour générer 2700 modèles 3D des assets du DAM.
+        \item 8 rendus \textbf{Blender} à des angles différents pour chaque modèle.
+    \end{itemize}
+    
+    \begin{columns}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=0.65\textwidth]{assets/trellis_input.png}
+            \caption{Input for TRELLIS}
+        \end{figure}
+        \column{0.5\textwidth}
+        \begin{figure}
+            \includegraphics[width=1\textwidth]{assets/trellis_output.png}
+            \caption{TRELLIS generated 3D model}
+        \end{figure}
+    \end{columns}
+    
+\end{frame}
+
+\begin{frame}{Data augmentation avec un modèle de géneration 3D}
+    % 4 images, 2x2
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-1.jpeg}
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-2.jpeg}
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-3.jpeg}
+        \includegraphics[width=0.35\textwidth]{assets/M9204UMOSM49E-4.jpeg}
+        \caption{3D renders of a bag}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Amélioration des performances grâce aux modèles 3D}
+    \begin{itemize}
+        \item Résultats sans l'augmentation 3D: Top-1: 36\%, Top-3: 47\%, Top-5: 59\%
+        \item Nous avons d'abord ajouté les embeddings 3D à l'index.
+        \item Puis nous avons retiré les embeddings 2D et avons constaté une amélioration des performances.
+        \item Enfin, nous avons fusionné (moyenne des deux) les embeddings 2D et 3D pour obtenir les meilleurs résultats. Intuition: les embeddings des photos capturent des informations plus précises sur la texture, la couleur, et les embeddings 3D capturent des informations sur la forme et l'orientation.
+        \item Nous avons utilisé la descente de gradients pour sélectionner les bons features ainsi que pour fusionner les embeddings 2D et 3D, mais les résultats n'était pas satisfaisants.
+        \item Résultats finaux: Top-1: 45\%, Top-3: 59\%, Top-5: 64\%.
+    \end{itemize}
+\end{frame}
+
+\section{User Interface}
+\begin{frame}{Interface Web avec Gradio}
+\begin{itemize}
+    \item Interface web simple avec Gradio.
+    \item Les utilisateurs peuvent uploader une photo et avoir le top-X des articles les plus similaires, ainsi que les références DAM.
+\end{itemize}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/gradio_interface.png}
+    \caption{Interface Gradio}
+\end{figure}
 \end{frame}
 
 \section{Evaluation}
@@ -200,7 +254,7 @@
     \hline
     \textbf{} & \textbf{Top-1} & \textbf{Top-3} & \textbf{Top-5} \\
     \hline
-    Accuracy & 40\% & 60\% & 75\% \\
+    Accuracy & 45\% & 59\% & 64\% \\
     \hline
     \end{tabular}
     \caption{Performances du modèle.}
@@ -233,10 +287,10 @@
 \end{frame}
 
 \begin{frame}{Expérimentations non concluantes}
-\item \textbf{Fine-tuning de ViT :}
+\textbf{Fine-tuning de ViT :}
 \begin{itemize}
         \item Faible convergence malgré un taux d'apprentissage réduit.
-        \item Très peu de données
+        \item Très long à entraîner et beaucoup de classes à prédire, pas assez de données.
 \end{itemize}
 
 \vspace{0.5cm}
@@ -246,6 +300,15 @@
     \includegraphics[width=1\textwidth]{assets/finetuning_vit.png}
     \caption{Exemple de prédiction après fine-tuning}
 \end{figure}
+\end{frame}
+
+\begin{frame}{Expérimentations non concluantes}
+    \begin{itemize}
+            \item Siamese Network : entraîné sur la data 3D, résultats OK mais pas concluants.
+            \item Réduction de dimension : PCA, AE, SAE, VAE... Meilleurs résultats avec les AE, mais pas concluants.
+            \item Modèles spécialisés : FashionClip, mauvais résultats, probablement car entraîné à classifier des produits dans une catégorie générique.
+    \end{itemize}
+
 \end{frame}
 
 
