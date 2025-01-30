@@ -73,6 +73,14 @@
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Modèle utilisé}
+    \begin{itemize}
+        \item \textbf{Extraction et traitement de l'article} : Utilisation de \texttt{RMBG} pour rogner l'image et supprimer le fond. 
+        \item \textbf{Embeddings d'image} : Modèle ViT par Google (Base Patch-32, 86.4M paramètres).
+        \item \textbf{Triplet Network} : Permet d'optimiser les embeddings pour réduire la distance cosinus entre des images similaires.
+    \end{itemize}
+    \end{frame}
+
 \section{Principe et architecture du modèle retenu}
 \begin{frame}{Traitement des images}
     \footnotesize
@@ -152,12 +160,18 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Modèle utilisé}
-\begin{itemize}
-    \item \textbf{Extraction et traitement de l'article} : Utilisation de \texttt{RMBG} pour rogner l'image et supprimer le fond. 
-    \item \textbf{Embeddings d'image} : Modèle ViT par Google (Base Patch-32, 86.4M paramètres).
-    \item \textbf{Triplet Network} : Permet d'optimiser les embeddings pour réduire la distance cosinus entre des images similaires.
-\end{itemize}
+\begin{frame}{Présentation du Modèle ViT Large Patch16 224}
+    \begin{itemize}
+        \item \textbf{Nom du Modèle} : \texttt{google/vit-large-patch16-224-in21k}
+        \item \textbf{Origine} : Développé par Google
+        \item \textbf{Nombre de Paramètres} : Environ 304 millions
+        \item \textbf{Pré-entraînement} : 
+        \begin{itemize}
+            \item Dataset : ImageNet-21k
+            \item Contenu : Environ 14 millions d'images couvrant 21 843 classes
+        \end{itemize}
+    \end{itemize}
+    \vspace{0.5cm}
 \end{frame}
 
 \section{Amélioration des résultats}
