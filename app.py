@@ -68,29 +68,28 @@ print(f"Using device: {device}")
 # ---------------------------- Model Setup ----------------------------
 
 # Initialize and load the model
-model = GoogleViTModel()
+model = FashionCLIPModel()
     
 FAISS_INDEX_PATH = os.path.join(BASE_PRECOMPUTED_DIR, 'faiss', f'dam_features-{model.model_name}-RMBG_2-3d.index')  # Update as needed
 
 # ---------------------------- Feature Aggregation ----------------------------
 
 def aggregate_embedding(embedding):
-    if len(embedding.shape) >= 2:
+    if len(embedding.shape) >= 2 and embedding.shape[0] > 1:
         # Flatten to (num_patches, feature_dim)
         embedding = embedding.squeeze()
-        # Apply PCA transformation
         
         # Aggregate by averaging
         if EMBEDDING_AGGREGRATION_METHOD == 'mean':
-            embedding = np.mean(embedding, axis=0).reshape(1, -1)  # Shape: (1, n_components)
+            embedding = np.mean(embedding, axis=0)
         elif EMBEDDING_AGGREGRATION_METHOD == 'CLS':
-            embedding = embedding[0, :].reshape(1, -1)  # Shape: (1, n_components) # Take only the CLS token
+            embedding = embedding[0, :]
         elif EMBEDDING_AGGREGRATION_METHOD == 'sum':
-            embedding = np.sum(embedding, axis=0).reshape(1, -1)  # Shape: (1, n_components)
+            embedding = np.sum(embedding, axis=0)
         elif EMBEDDING_AGGREGRATION_METHOD == 'max':
-            embedding = np.max(embedding, axis=0).reshape(1, -1)  # Shape: (1, n_components)
+            embedding = np.max(embedding, axis=0)
             
-    return embedding
+    return embedding.reshape(1, -1)
 
 # ---------------------------- Load FAISS Index and Mappings ----------------------------
 

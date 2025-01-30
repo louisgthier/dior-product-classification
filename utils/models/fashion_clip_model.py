@@ -52,10 +52,16 @@ class FashionCLIPModel(BaseModel):
             numpy.ndarray: The extracted image features as a flattened NumPy array.
         """
         
-        if type(pil_image) != list:
+        single_image = type(pil_image) != list
+        
+        if single_image:
             pil_image = [pil_image]
         
         image_embeddings = self.fclip.encode_images(pil_image, batch_size=32)
+        
+        if single_image:
+            image_embeddings = image_embeddings[0]
+        
         # image_embeddings = image_embeddings/np.linalg.norm(image_embeddings, ord=2, axis=-1, keepdims=True)
         return image_embeddings
         

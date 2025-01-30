@@ -23,6 +23,8 @@ Ensure you have **Python 3.8** or higher installed. Install the required depende
 pip install -r requirements.txt
 ```
 
+Download the `data` directory from the [Hugging Face Hub](https://huggingface.co/datasets/louisgthier/dior-dam-dataset) and place it in the project root.
+
 ## Directory Structure
 
 ```plaintext
