@@ -54,15 +54,14 @@
 \end{frame}
 
 \begin{frame}{Jeu de données : Difficultés}
-    \begin{itemize}
-        \item Dataset de test (80 images) non labélisé.
-        \item Grand nombre d'articles dans la base DAM (2766 articles).
-        \item Unique photo par classe : difficile de faire de la classification. Et en plus classification = pas scalable.
-        \item Les images (surtout celles du test) ne sont pas standardisées (background, orientation...)
-        \item Images très similaires dans DAM.
-        \item Deux images de test dont le label n'est pas présent dans DAM.
-    \end{itemize}
-    \end{frame}
+\begin{itemize}
+    \item Grand nombre d'articles dans la base DAM (2766 articles).
+    \item Unique photo par classe : difficile de faire de la classification
+    \item Les images (surtout celles du test) ne sont pas standardisées (background, orientation...)
+    \item Images très similaires dans DAM.
+    \item Deux images de test dont le label n'est pas présent dans DAM.
+\end{itemize}
+\end{frame}
 
 
 \section{Intuitions}
@@ -157,7 +156,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Présentation du Modèle ViT Large Patch16}
+\begin{frame}{Présentation du Modèle ViT Base Patch32 224}
     \begin{itemize}
         \item \textbf{Nom du Modèle} : \texttt{google/vit-large-patch16-224}
         \item \textbf{Origine} : Développé par Google
@@ -270,7 +269,7 @@
         \begin{itemize}
             \item \textbf{Data Augmentation} : L'augmentation des données, via la 3D, contribue à une meilleure généralisation du modèle.
             \item \textbf{ViT} Les modèles ViT sont les modèles les plus performant pour réaliser les embeddings
-            \item \textbf{MaxCos} L'utilisation de MaxCosine est la manière la plus performante de combiner les embeddings 2D et 3D.
+            \item \textbf{MaxCos} L'utilisation de MaxCos est meilleure que MeanCos pour la comparaison des embeddings.
         \end{itemize}
     \end{block}
 \end{frame}
