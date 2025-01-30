@@ -348,30 +348,37 @@
     \begin{itemize}
             \item Siamese Network : entraîné sur la data 3D, résultats OK mais pas concluants.
             \item Réduction de dimension : PCA, AE, SAE, VAE... Meilleurs résultats avec les AE, mais pas concluants.
-            \item Modèles spécialisés : FashionClip, mauvais résultats
+            \item Modèles spécialisés : FashionClip, mauvais résultats, probablement car entraîné à classifier des produits dans une catégorie générique.
+            \item Autres modèles moins performants testés : DinoV2, ResNet, Clip, VitMsn.
     \end{itemize}
-
 \end{frame}
 
 
 
 \section{Conclusion}
-\begin{frame}{Conclusion}
-\begin{itemize}
-    \item Modèle performant grâce à l'ajout de rendus 3D et la combinaison des embeddings 2D/3D.
-    \item Résultats encourageants avec une précision Top-1 de 40\%, mais améliorable.
-    \item Pistes futures :
-    \begin{itemize}
-        \item Utilisation de modèles NLP avec plus de paramètres pour enrichir les descriptions d'images et améliorer la prédiction du top-1.
-    \end{itemize}
-\end{itemize}
-\end{frame}
 
-\begin{frame}{Références}
-    \footnotesize
-    \nocite{BiRefNet}
-    \bibliographystyle{plain} % Style de la bibliographie
-    \bibliography{reference}  % Fichier .bib contenant les références
+\begin{frame}{Conclusion}
+
+\begin{itemize}
+
+\item Modèle performant avec rendus 3D et embeddings 2D/3D.
+
+\item Précision Top-1 de 40 \%, mais améliorable.
+
+\item Pistes futures :
+
+\begin{itemize}
+
+\item Tester un modèle multimodal plus puissant pour générer des descriptions (Janus, BLIP 3B).
+
+\item Data augmentation (flip, rotations, zooms) pour chaque image DAM. Déjà testé mais très long. 
+
+\item Amélioration du dataset DAM : webscraping ? 
+
+\end{itemize}
+
+\end{itemize}
+
 \end{frame}
 
 \end{document}
