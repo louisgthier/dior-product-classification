@@ -243,18 +243,62 @@
 \end{frame}
 
 \section{Evaluation}
-\begin{frame}{Evaluation des résultats}
-\begin{table}[]
-    \centering
-    \begin{tabular}{|c|c|c|c|}
-    \hline
-    \textbf{} & \textbf{Top-1} & \textbf{Top-3} & \textbf{Top-5} \\
-    \hline
-    Accuracy & 45\% & 59\% & 64\% \\
-    \hline
-    \end{tabular}
-    \caption{Performances du modèle.}
-\end{table}
+\begin{frame}{Comparaison des Modèles}
+    \begin{center}
+        \begin{table}[]
+            \centering
+            \scriptsize % Réduction de la taille du texte pour mieux s’adapter à l’espace
+            \begin{tabular}{|l|c|c|c|}
+                \hline
+                \textbf{Modèle} & \textbf{Top-1 (\%)} & \textbf{Top-3 (\%)} & \textbf{Top-5 (\%)} \\
+                \hline
+                rembg - ResNet50 & 38.75 & 53.75 & 61.25 \\
+                \hline
+                ViT Large - RMBG 2 - 2D & 38.75 & 53.75 & 61.25 \\
+                \hline
+                ViT Large - RMBG 2 - 3D - MeanCos & 41.25 & 62.5 & 68.75 \\
+                \hline
+                ViT Large - RMBG 2 - 3D - MaxCos & 41.25 & 62.5 & 68.75 \\
+                \hline
+            \end{tabular}
+            \caption{Comparaison des performances des différents modèles}
+        \end{table}
+    \end{center}
+    
+    \begin{block}{Interprétation des Résultats}
+        \begin{itemize}
+            \item \textbf{Data Augmentation} : L'augmentation des données, via la 3D, contribue à une meilleure généralisation du modèle.
+            \item \textbf{ViT} Les modèles ViT sont les modèles les plus performant pour réaliser les embeddings
+            \item \textbf{MaxCos} L'utilisation de MaxCosine est la manière la plus performante de combiner les embeddings 2D et 3D.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Matrice de Confusion}
+\begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+        \vspace{0.5cm}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.9\textwidth]{assets/confusion_matrix.png} % Remplacez par votre image
+            \caption{Matrice de confusion illustrant les prédictions du modèle}
+        \end{figure}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+        \begin{block}{Analyse des Résultats}
+            \begin{itemize}
+                \item \textbf{Bonne capacité de distinction globale} : la majorité des images sont bien classées.
+                \item \textbf{Confusion entre classes similaires} :
+                \begin{itemize}
+                    \item Articles de couleur proche ou motifs similaires.
+                    \item Sacs / Ceintures en cuir.
+                \end{itemize}
+                \item L'écart entre le Top-5 et le Top-1 montre que le modèle capture les bonnes caractéristiques mais a du mal à affiner le classement final.
+            \end{itemize}
+        \end{block}
+    \end{column}
+\end{columns}
 \end{frame}
 
 \section{Expérimentations non concluantes}
