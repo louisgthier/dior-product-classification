@@ -57,8 +57,8 @@
     \item Grand nombre d'articles dans la base DAM (2766 articles).
     \item Unique photo par classe : difficile de faire de la classification
     \item Les images (surtout celles du test) ne sont pas standardisées (background, orientation...)
-    \item Images en double dans DAM
-    \item Images de test dont le label n'est pas présent dans DAM.
+    \item Images très similaires dans DAM.
+    \item Deux images de test dont le label n'est pas présent dans DAM.
 \end{itemize}
 \end{frame}
 
@@ -126,7 +126,7 @@
             \hline
             \textbf{Critère} & \textbf{U2Net (rembg)} & \textbf{RMBG-2.0} \\
             \hline
-            Architecture du modèle & U-Net modifié & Transformer basé \\
+            Architecture du modèle & U-Net modifié & développé à partir de BiRefNet \\
             \hline
             Nombre de paramètres & 44M & 221M \\
             \hline
@@ -247,6 +247,13 @@
         \item Utilisation de modèles NLP avec plus de paramètres pour enrichir les descriptions d'images et améliorer la prédiction du top-1.
     \end{itemize}
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Références}
+    \footnotesize
+    \nocite{BiRefNet}
+    \bibliographystyle{plain} % Style de la bibliographie
+    \bibliography{reference}  % Fichier .bib contenant les références
 \end{frame}
 
 \end{document}
