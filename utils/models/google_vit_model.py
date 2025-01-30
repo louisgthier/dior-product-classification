@@ -1,4 +1,6 @@
 # vit_model.py
+import os
+os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
 import torch
 from transformers import ViTImageProcessor, ViTModel
 from .base_model import BaseModel
@@ -8,7 +10,9 @@ class GoogleViTModel(BaseModel):
         model_size = "large"
         in21k = False
         name = f"google/vit-{model_size}-patch16-224{'-in21k' if in21k else ''}"
+        print(f"Loading processor and model: {name}")
         self.processor = ViTImageProcessor.from_pretrained(name)
+        print(f"Processor loaded: {name}")
         self.model_name = type(self).__name__ + "_" + model_size + ("_in21k" if in21k else "")
         return ViTModel.from_pretrained(name).to(self.device)
 

@@ -182,3 +182,4 @@ cython_debug/
 
 /embeddings/
 /tmp/
+/vit-finetuned/
