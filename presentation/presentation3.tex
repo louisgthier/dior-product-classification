@@ -222,12 +222,13 @@
 
 \begin{frame}{Amélioration des performances grâce aux modèles 3D}
     \begin{itemize}
-        \item Résultats sans l'augmentation 3D: Top-1: 36\%, Top-3: 47\%, Top-5: 59\%
+        \item Résultats sans l'augmentation 3D avec Google ViT: Top-1: 36\%, Top-3: 47\%, Top-5: 59\%
         \item Nous avons d'abord ajouté les embeddings 3D à l'index.
         \item Puis nous avons retiré les embeddings 2D et avons constaté une amélioration des performances.
         \item Enfin, nous avons fusionné (moyenne des deux) les embeddings 2D et 3D pour obtenir les meilleurs résultats. Intuition: les embeddings des photos capturent des informations plus précises sur la texture, la couleur, et les embeddings 3D capturent des informations sur la forme et l'orientation.
         \item Nous avons utilisé la descente de gradients pour sélectionner les bons features ainsi que pour fusionner les embeddings 2D et 3D, mais les résultats n'était pas satisfaisants.
-        \item Résultats finaux: Top-1: 45\%, Top-3: 59\%, Top-5: 64\%.
+        \item Résultats Google ViT: Top-1: 45\%, Top-3: 59\%, Top-5: 64\%.
+        \item Résultats finaux avec FashionCLIP: Top-1: 61\%, Top-3: 80\%, Top-5: 81\%.
     \end{itemize}
 \end{frame}
 
@@ -261,6 +262,8 @@
                 ViT Large - RMBG 2.0 - 3D - Mean Cos & 41.25 & 62.5 & 68.75 \\
                 \hline
                 ViT Large - RMBG 2.0 - 3D - Max Cos & 45 & 58 & 63 \\
+                \hline
+                FashionCLIP - RMBG 2.0 - 3D - Max Cos & 61 & 80 & 81 \\
                 \hline
             \end{tabular}
             \caption{Comparaison des performances des différents modèles}
@@ -348,7 +351,6 @@
     \begin{itemize}
             \item Siamese Network : entraîné sur la data 3D, résultats OK mais pas concluants.
             \item Réduction de dimension : PCA, AE, SAE, VAE... Meilleurs résultats avec les AE, mais pas concluants.
-            \item Modèles spécialisés : FashionClip, mauvais résultats, probablement car entraîné à classifier des produits dans une catégorie générique.
             \item Autres modèles moins performants testés : DinoV2, ResNet, Clip, VitMsn.
     \end{itemize}
 \end{frame}
@@ -363,7 +365,7 @@
 
 \item Modèle performant avec rendus 3D et embeddings 2D/3D.
 
-\item Précision Top-1 de 40 \%, mais améliorable.
+\item Précision Top-1 de 61\% avec FashionCLIP.
 
 \item Pistes futures :
 
